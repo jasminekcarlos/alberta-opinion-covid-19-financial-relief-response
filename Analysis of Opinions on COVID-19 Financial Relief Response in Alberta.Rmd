@@ -1,0 +1,606 @@
+---
+title: "Analysis of Opinions on COVID-19 Financial Relief Response in Alberta"
+author: "Jasmine Carlos, Matthew Caringi, Haeun Choi, Mahmoud Elsheikh"
+date: "10/7/2020"
+output: pdf_document
+---
+
+Note that all code and data used in this analysis can be found at the following link: https://github.com/jasminekcarlos/alberta-opinion-covid-19-financial-relief-response
+
+```{r loading packages, include=FALSE}
+library(tidyverse)
+library(readr)
+library(dplyr)
+library(knitr)
+library(ggplot2)
+
+```
+
+# Executive summary
+
+Petit Poll has been asked by the Liberal party to survey Alberta to understand whether people are likely to vote for the Party in the upcoming general election. In order to investigate how satisfied the Alberta residents are with the Liberal party, we surveyed the satisfaction level of the Canadian Emergency Response Benefit (CERB) and Canadian Emergency Student Benefit (CESB) which are the current financial support from the government due to the massive amount of job loss in Canada as a result of the COVID outbreak. We found out that the citizens in Alberta are not entirely satisfied with the emergency response financial support from the government. The main reasons why the citizens were not satisfied with the government’s financial support are because it is restrictive to time periods and the insufficient amount of the benefits. This can infer that the Alberta residents are less likely to vote for the Liberal party in the next Federal election. The weakness we have in this survey is that we only investigated the Liberal party and its response to the pandemic. We did not look at other parties and there is a potential that the Canadian citizens might have been even more dissatisfied with the other political party’s reaction to COVID-19. In the future survey, we can compare different political parties and their assertion on what they will be doing for the Canadian citizens and consider the satisfaction level. 
+
+# Introduction
+
+During March 2020, many provinces declared a state of emergency due to the COVID-19 pandemic. Within the first month of the pandemic, the employment rate in Canada dropped 6.4% with citizens 15 years and older (Labour Force Characteristics by Province, Monthly, Seasonally Adjusted, 2018). In response, the federal government led by Liberal party’s leader, Justin Trudeau (Prime, 2013), began a financial relief program. This program consisted of the Canadian Emergency Response Benefit (CERB) and the Canadian Emergency Student Benefit (CESB) which both program’s goals were to provide financial support to individuals who have become unemployed or could not get employed due to the COVID-19 pandemic.
+
+In the scope of this survey study, the population of interest is eligible voters within the province of Alberta, Canada. Reported during the 2019 Federal Election, the Conservative Party were awarded 33 out of 34 electoral districts as well as obtained 69.2% of the total votes in Alberta (Election Night Results - Provinces & Territories). In contrast, the Liberal party was not awarded an electoral district and held 13.7% of the total votes in Alberta (Election Night Results - Provinces & Territories). Thus, the survey’s goal is to gather information about how the residents in Alberta feel about the Liberal’s financial relief response in order to gain insight about future votes for the next federal election in 2023. 
+
+The main findings from the survey include how the citizens in Alberta were not fond of the Liberal federal government’s initiatives for financial relief in the COVID-19 pandemic. This dislike stems from the programs, CERB and CESB, providing too little funds for  sustainable living as well as the programs’ eligibility of income being too restrictive. These findings were produced from a data simulation of the survey based on real life parameters in Alberta. Future work includes distributing the survey to the target population in order to gain true results rather than predictive responses. Additionally, the scope of the survey does not entail a comparative aspect to other federal political parties, thus no conclusion can be made on whether the Liberty party will gain or lose votes based on this event.
+
+# Survey methodology 
+
+This survey is targeted towards eligible voters, 18 years old and older, who reside in the province of Alberta, Canada. The survey will be distributed by postal mail through systematic selection from the Alberta list of electors. In 2019, the list of electors in Alberta consisted of 2.8 million people, which is used as the targeted population (Overall Summary of Ballots Cast and Voter Turnout 1975-2019, 2020). Using Slovin's formula, a sample size for this known population was created.
+
+n=N/(1+(Ne^2))
+Where n is the sample size, N is the known population, and e is the margin of error.
+
+A sample size of 400 people with a 5% margin of error was calculated. An estimation of 10 percent response rate was assumed for postal mail surveys (Sinclair, 2012). Therefore, 4000 surveys were sent to the targeted population. Systematic sampling was applied to select the sample population. In this method, the first person selected was the 5th name on the elector list then the consecutive 700th person was selected in order to obtain the desired 4000 people. Although the list of electors are alphabetically sorted, this variable does not impact the results of the reponses (Canada, Elections). Systematic sampling provides randomness in selection thus represents the true population.
+
+The total cost of the survey includes the postal service and the supplies (Corporation, Canada Post). Each selected person from the target population received one survey and one postage paid envelope in their survey package. Below is the individual price for each of the supplies needed as well as the total cost of the surveys for 4000 people. 
+
+Postage Paid Envelope: $1.28
+Printed Survey: $0.15
+
+Total Cost = 4000*($0.15 + ($1.28)*2))
+Total Cost = $10 840  
+
+Some problems that may occur include privacy issues and non-response participants. With the issue about privacy, participants’ names will not be asked on the survey as well as their home address will not be on the return postage paid envelope. Therefore, the returned surveys will be completely anonymous. Countering the issue of non-response participates, if the minimum sample size of 400 is not obtained during the first attempt, another round of surveys will be distributed. The second round will be similar to the first round’s parameters and variables but instead the first person selected will be the 10th name on the elector list then the consecutive 700th person following. These rounds will continue until the desired minimum sample size of 400 is achieved. The financial concern about this approach is that each round will cost an additional $10 480, which might exceed the initial budget for this survey study.
+
+# Results
+
+The following are a series of graphs used for the analysis of the survey data.
+
+```{r, include=FALSE}
+# A seed is set so the simulation is reproducible.
+set.seed(123)
+
+# It is expected that we will receive 400 responses so the survey size is set /
+# to 400.
+survey_size = 400
+
+# The following is a simulation the question "How old are you?". The multiple /
+# choice options for this question are: a) 18-29, b) 30-39, c)40-49, d) 50-59, /
+# e) 60+.
+
+# We assume that the frame is indicative of the population of Alberta and the /
+# probabilities are adjusted to convey Alberta's demographic data.
+
+age = sample(x = c("18-29", "30-39", "40-49", "50-59", "60+"), 
+               size =  survey_size, replace = TRUE, 
+             prob = c(0.21,0.2,0.2,0.17,0.22))
+
+# The following is a simulation for the question "What is your employment 
+# status before March?". The multiple choice options for this question are: /
+# a) Unemployed, b) Employed/Self-employed.
+
+# The probability of the respective options were determined using the /
+# unemployment rate in the province of Alberta in February 2020 as this is /
+# when the pandemic began to take its effect. The unemployment rate in /
+# February 2020 was 7.2%.
+
+pre_employment_status = sample(x = c("Unemployed", "Employed/Self-Employed"), 
+                           size = survey_size, replace = TRUE, 
+                           prob = c(0.072, 0.928))
+
+# The following is a simulation for the question "What is your current /
+# employment status?". The multiple choice options for this question are: /
+# a) Unemployed, b) Employed/Self-employed.
+
+# We assume the employment data based on the labour force characteristics /
+# of Alberta.
+
+curr_employment_status = sample(x= c("Employed/Self-employed", "Unemployed"), 
+                             size = survey_size, replace = TRUE, 
+                             prob = c(0.12,0.88))
+
+# The following is a simulation for the question "Are you currently a student?". 
+# The multiple choice options for this question are : a) Yes, b) No.
+
+# The probability of the options was determined using the latest information /
+# on the amount of people enrolled in post-secondary institutions and the /
+# population of Alberta. With 194,010 people enrolled in post-secondary and a /
+# population of 4,421,876 this means 4.39% of people are students in /
+# post-secondary.
+
+student_var = sample(x = c("Yes", "No"), 
+                     size = survey_size, replace = TRUE, 
+                     prob = c(0.0439, 0.9561))
+
+# The following is a simulation for the question "Were you eligible for Canada /
+# Emergency Student Benefit (CESB)?". The multiple choice options for this /
+# question are : a) Yes, b) No.
+
+# The probabilities were set based on information released by the Canadian /
+# federal government in relation to application and eligibility for CESB.
+
+CESB_eligibility = sample(x= c("Yes", "No"), size = survey_size,
+                            replace = TRUE, prob = c(0.0439,0.9561))
+
+# The following is a simulation for the question "Were you eligible for Canada /
+# Emergency Relief Benefit (CERB)?". The multiple choice options for this /
+# question are : a) Yes, b) No.
+
+# The probabilities were set based on information released by the Canadian /
+# federal government in relation to application and eligibility for CERB.
+
+CERB_eligibility = sample(x= c("Yes", "No"), size = survey_size,
+                            replace = TRUE, prob = c(0.241,0.759))
+
+# The following is a simulation for the question "If you applied, how many /
+# periods did you apply for CESB?". The multiple choice options for this /
+# question are: a) N/A, b) 1, c) 2, d) 3, e) 4
+
+# The probability of each option was determined using statistics released in /
+# relation to CESB. The percentage of people who are not students was used for /
+# the N/A option and the rest of the option probabilities were allocated /
+# proportionally to how many applications were approved per period.
+
+peri_CESB_app = sample(x = c(0:4), size = survey_size, replace = TRUE, 
+                       prob = c(0.9561, 0.0119, 0.0108, 0.0110, 0.0102))
+
+# The following is a simulation for the question " If you applied, how many /
+# periods did you apply for CERB?". The multiple choice options for this /
+# question are: a) N/A, b) 1, c) 2, d) 3, e) 4, f) 5, g) 6, h) 7
+
+# The probability of each option was determined using statistics released in /
+# relation to CERB. The percentage of the population that did not apply to /
+# CERB was used for the zero option and the rest of the option probabilities /
+# were allocated proportionally to how many applications were approved per /
+# period.
+
+peri_CERB_app = sample(x = c(0:7), size = survey_size, replace = TRUE, 
+                       prob = c(0.759, 0.039, 0.039, 0.036, 0.032, 0.036, 
+                                0.030, 0.029))
+
+# The following is a simulation for the question "Do you believe that $1250 /
+# payment of CESB a month is sustainable for students?". The multiple choice /
+# options for this question are: a) Too little, b) Adequate, c) Too much.
+
+# The probabilities of the options were determined using statistics collected /
+# from an Ipsos survey done on behalf of Global News on public opinions about /
+# COVID-19 financial relief response.
+
+CESB_sustainability = sample(x= c("Too little", "Adequate", "Too much"),
+                             size = survey_size, replace = TRUE, 
+                             prob = c(0.3,0.5,0.2))
+
+# The following is a simulation for the question "Do you believe that $2000 /
+# payment of CERB a month is sustainable?". The multiple choice options for /
+# this question are: a) Too little, b) Adequate, c) Too much.
+
+# The probabilities of the options were determined using statistics collected /
+# from an Ipsos survey done on behalf of Global News on public opinions about /
+# COVID-19 financial relief response.
+
+CERB_sustainability = sample(x= c("Too little", "Adequate", "Too much"),
+                             size = survey_size, replace = TRUE, 
+                             prob = c(0.4,0.35,0.25))
+
+
+# The following is a simulation for the question "Do you believe the 16 weeks /
+# period for CESB was long enough?". The multiple choice options for this /
+# question are: a) Too short,  b) Adequate, c) Too long.
+
+# The probabilities of the options were determined using statistics collected /
+# from an Ipsos survey done on behalf of Global News on public opinions about /
+# COVID-19 financial relief response.
+
+peri_CESB_length = sample(x = c("Too Short", "Adequate", "Too Long"), 
+                          size = survey_size, replace = TRUE, 
+                          prob = c(0.52, 0.28, 0.20))
+
+# The following is a simulation for the question "Do you believe the 28 weeks /
+# period for CERB was long enough?". The multiple choice options for this /
+# question are: a) Too short,  b) Adequate, c) Too long
+
+# The probabilities of the options were determined using statistics collected /
+# from an Ipsos survey done on behalf of Global News on public opinions about /
+# COVID-19 financial relief response.
+
+peri_CERB_length = sample(x = c("Too Short", "Adequate", "Too Long"), 
+                          size = survey_size, replace = TRUE, 
+                          prob = c(0.52, 0.28, 0.20))
+
+# The following is a simulation for the question "On a scale of 1 to 5 how /
+# satisfied are you with the 4 weeks extension of CERB?". The multiple choice /
+# options for this question are: a) 1 (Highly unsatisfied), b) 2 (Unsatisfied) /
+# c) 3 (Moderate), d) 4 (Satisfied), e) 5 (Highly unsatisfied).
+
+# The probabilities of the options were determined using statistics collected /
+# from an Ipsos survey done on behalf of Global News on public opinions about /
+# COVID-19 financial relief response.
+
+CERB_ext = sample(x= c("1 (Highly unsatisfied)", "2 (Unsatisfied)", 
+                       "3 (Neutral)", "4 (Satisfied)", "5 (Highly satisfied)"),
+                  size = survey_size, 
+                  replace = TRUE, prob = c(0.03,0.05,0.2,0.22,0.1))
+
+# The following is a simulation for the question "Do you believe that the 4 /
+# weeks extension should have been applied to CESB as well?". The multiple /
+# choice options for this question are: a) Yes, b) No.
+
+# The probabilities of the options were determined using statistics collected /
+# from an Ipsos survey done on behalf of Global News on public opinions about /
+# COVID-19 financial relief response.
+
+CESB_ext = sample(x= c("Yes", "No"), size = survey_size,
+                  replace = TRUE, prob = c(0.75,0.25))
+
+# The following is a simulation for question "What are your thoughts on /
+# income restriction (earning less than $1000 a month) for CERB?". The multiple /
+# choice options for this question are: a) Too restrictive, b) Fair, /
+# c) Too lenient.
+
+# The probabilities of the options were determined using statistics collected /
+# from an Ipsos survey done on behalf of Global News on public opinions about /
+# COVID-19 financial relief response.
+
+inc_restr_CERB = sample(x = c("Too Restrictive", "Fair", "Too Lenient"), 
+                        size = survey_size, replace = TRUE, 
+                        prob = c(0.52, 0.28, 0.20))
+
+# The following is a simulation for question "What are your thoughts on /
+# income restriction (less than $1000 a month) for CESB?". The multiple choice /
+# options for this question are: a) Too restrictive, b) Fair, c) Too lenient.
+
+# The probabilities of the options were determined using statistics collected /
+# from an Ipsos survey done on behalf of Global News on public opinions about /
+# COVID-19 financial relief response.
+
+inc_restr_CESB = sample(x = c("Too Restrictive", "Fair", "Too Lenient"), 
+                        size = survey_size, replace = TRUE, 
+                        prob = c(0.52, 0.28, 0.20))
+
+# The following is a table which combines all of the simulated variables
+
+survey_data <- tibble(age, pre_employment_status, curr_employment_status,
+                      student_var, CESB_eligibility, CERB_eligibility, 
+                      peri_CESB_app, peri_CERB_app, CESB_sustainability,
+                      CERB_sustainability, peri_CESB_length, peri_CERB_length,
+                      CERB_ext, CESB_ext, inc_restr_CERB, inc_restr_CESB)
+
+```
+
+The following is a graph visualizing the distribution of responses to the question "How old are you?".
+
+```{r, echo = FALSE}
+age_graph <- 
+  survey_data %>%
+  select(age) %>%
+  ggplot(aes(x=age)) +
+  geom_bar() +
+  labs(
+    title = "Figure 1: Distribution of the Age of Respondents",
+    x = "Age groups",
+    y = "Number of Respondents",
+    caption = "Source = Simulated Dataset"
+  )
+
+age_graph
+```
+
+Figure 1 displays the age demographic of our respondents in a bar chart. This was done by obtaining the demographic data of our frame being eligible voters of Alberta. As you can see the largest proportion is the youngest demographic of 18-29 representing 21% of the demographic.
+
+The following is a graph visualizing the distribution of responses to the question "Do you believe that $1250 payment of CESB a month is sustainable for students?".
+
+```{r, echo = FALSE}
+CESB_sustainability_graph <- 
+  survey_data %>%
+  select(CESB_sustainability) %>%
+  ggplot(aes(CESB_sustainability)) +
+  geom_bar() +
+  labs(
+    title = "Figure 2: Distribution of Opinions on the Sustainability of CESB
+    Payments",
+    x = "Opinions on the sustainability of CESB payments",
+    y = "Number of Respondents",
+    caption = "Source = Simulated Dataset"
+  ) 
+
+CESB_sustainability_graph
+```
+
+Figure 2 displays the CESB’s sustainability results in a bar chart. The simulation was done based on an Ipsos survey done on Canadians to find the level of satisfaction with the financial aid packages. The majority of respondents (50%) believed this was adequate followed by too little (30%) and only 20% thought it was too much.
+
+The following is a graph visualizing the distribution of responses to the question "Do you believe that $2000 payment of CERB a month is sustainable?".
+
+```{r, echo = FALSE}
+CERB_sustainability_graph <- 
+  survey_data %>%
+  select(CERB_sustainability) %>%
+  ggplot(aes(CERB_sustainability)) +
+  geom_bar() +
+  labs(
+    title = "Figure 3: Distribution of Opinions on the Sustainability of CERB
+    Payments",
+    x = "Opinions on the sustainability of CERB payments",
+    y = "Number of Respondents",
+    caption = "Source = Simulated Dataset"
+  ) 
+
+CERB_sustainability_graph
+```
+
+Figure 3 shows the CERB’s sustainability results in a bar chart. This simulation was also done using the Ipsos survey and shows that the majority (40%) of respondents thought the financial aid was too little followed by 35% believing it was adequate and 25% reporting it was too much.
+
+The following is a graph visualizing the distribution of responses to the question "If you applied, how many periods did you apply for CESB?".
+
+```{r, echo = FALSE}
+peri_CESB_app_graph <- 
+  survey_data %>%
+  select(peri_CESB_app) %>%
+  mutate(peri_CESB_app = as.factor(peri_CESB_app)) %>%
+  ggplot(aes(x=peri_CESB_app)) +
+  geom_bar() +
+  labs(
+    title = "Figure 4: Distribution of the Amount of Periods Respondents 
+    Applied to CESB",
+    x = "Number of CESB periods applied",
+    y = "Number of Respondents",
+    caption = "Source = Simulated Dataset"
+  ) 
+
+peri_CESB_app_graph
+```
+
+Figure 4 shows the periods applied to the CERB in a bar chart. This simulation was done using the Ipsos survey and shows that 76% of respondents only applied for the first period followed by 3-4% for the following 7 periods.
+
+The following is a graph visualizing the distribution of responses to the question "If you applied, how many periods did you apply for CERB?".
+
+```{r, echo = FALSE}
+peri_CERB_app_graph <- 
+  survey_data %>%
+  select(peri_CERB_app) %>%
+  mutate(peri_CERB_app = as.factor(peri_CERB_app)) %>%
+  ggplot(aes(x=peri_CERB_app)) +
+  geom_bar() +
+  labs(
+    title = "Figure 5: Distribution of the Amount of Periods Respondents 
+    Applied to CERB",
+    x = "Number of CERB periods applied",
+    y = "Number of Respondents",
+    caption = "Source = Simulated Dataset"
+  ) 
+
+peri_CESB_app_graph
+```
+
+Figure 5 shows the periods applied to the CESB based on data from the Ipsos survey in a bar chart. This shows that an overwhelming 95.6% of respondents only applied for the first period followed by 1-1.2% for the following 4 periods.
+
+The following is a graph visualizing the distribution of responses to the question "What are your thoughts on income restriction (earning less than $1000 a month) for CERB?".
+
+```{r, echo = FALSE}
+inc_restr_CERB_graph <- 
+  survey_data %>%
+  select(inc_restr_CERB) %>%
+  ggplot(aes(x=inc_restr_CERB)) +
+  geom_bar() +
+  labs(
+    title = "Figure 6: Distribution of Opinions on the Income Restriction for
+    CERB",
+    x = "Opinions on the income restriction for CERB",
+    y = "Number of Respondents",
+    caption = "Source = Simulated Dataset"
+  ) 
+
+inc_restr_CERB_graph
+```
+
+The following is a graph visualizing the distribution of responses to the question "What are your thoughts on income restriction (earning less than $1000 a month) for CESB?".
+
+```{r, echo = FALSE}
+inc_restr_CESB_graph <- 
+  survey_data %>%
+  select(inc_restr_CESB) %>%
+  
+  ggplot(aes(x=inc_restr_CESB)) +
+  geom_bar() +
+  labs(
+    title = "Figure 7: Distribution of Opinions on the Income Restriction for
+    CESB",
+    x = "Opinions on the income restriction for CERB",
+    y = "Number of Respondents",
+    caption = "Source = Simulated Dataset"
+  ) 
+
+inc_restr_CESB_graph
+```
+
+Figures 6 and 7 displays the subject’s opinions on the income restrictiveness of the CERB and CESB in bar charts based on the Ipsos survey. This showed identical results between the CESB and CERB in terms of proportions. We can see that 52% of respondents thought it was too restrictive followed by 28% reporting it was fair and 20% believing it was too lenient.
+
+The following is a graph visualizing the distribution of responses to the question "Do you believe that $1250 payment of CESB a month is sustainable for students?" across the various age groups.
+
+```{r, echo = FALSE}
+age_CESB_sustainability_graph <- 
+survey_data %>%
+  ggplot( aes(x = age, fill = CESB_sustainability)) + 
+  geom_bar(position = "dodge") +
+  labs(
+    title = "Figure 8: Distribution of Opinions on the Sustainability of CESB
+    Payments Across Age Groups",
+    x = "Age Groups",
+    y = "Number of Respondents",
+    fill = "Opinions on sustainability of CESB payments",
+    caption = "Source = Simulated Dataset")
+
+age_CESB_sustainability_graph
+```
+
+Figure 8 displays how the different age groups responded to the CESB’s sustainability in a bar chart. All age groups found had the greatest proportion of respondents believing it was adequate followed by too little then too much; however, the most significant result is the 60+ demographic. This is because they have the lowest proportional difference between too little and too much. This is supported in the Ipsos report on the survey where they identified that the older demographic was more likely to believe that the financial aid was too much. 
+
+The following is a graph visualizing the distribution of responses to the question "Do you believe that $2000 payment of CERB a month is sustainable?" across the various age groups.
+
+```{r, echo = FALSE}
+age_CERB_sustainability_graph <- 
+  survey_data %>%
+  ggplot( aes(x = age, fill = CERB_sustainability)) + 
+  geom_bar(position = "dodge") +
+  labs(
+    title = "Figure 9: Distribution of Opinions on the Sustainability of CERB
+    Payments Across Age Groups",
+    x = "Age Groups",
+    y = "Number of Respondents",
+    fill = "Opinions on sustainability of CERB payments",
+    caption = "Source = Simulated Dataset")
+
+age_CERB_sustainability_graph
+```
+
+Figure 9 displays how the different age groups responded to the CERB’s sustainability in a bar chart. These results are more varied than those of the CESB with the majority of age groups believing the aid was too little with the exception of the 50-59 demographic where the greatest proportion of respondents thought it was adequate. Another interesting exception was that in the age groups 40-49 and 60+ more respondents thought the aid was too much than too little. This is also consistent with the findings in figure 9 that show that older demographics are more likely to believe the aid was too much than younger demographics. 
+
+The following is a graph visualizing the distribution of responses to the question "What are your thoughts on income restriction (earning less than $1000 a month) for CERB?" in relation to how many periods a respondent applied for.
+
+```{r, echo = FALSE}
+CERB_restr_peri_graph <- 
+  survey_data %>%
+  mutate(peri_CERB_app = as.factor(peri_CERB_app)) %>%
+  ggplot( aes(x = peri_CERB_app, fill = inc_restr_CERB)) + 
+  geom_bar(position = "dodge") +
+  labs(
+    title = "Figure 10: Distribution of Opinions on the Income Restriction for
+    CERB Over Number of Periods Applied",
+    x = "CERB Periods Applied",
+    y = "Number of Respondents",
+    fill = "Opinions on CERB income restriction",
+    caption = "Source = Simulated Dataset")
+
+CERB_restr_peri_graph
+```
+
+Figure 10 displays how respondents responded to the CERB income restriction based on the periods they applied for. This negative correlation between the number of periods and the proportion of respondents that believed the income restriction was too restrictive is displayed in the bar chart. This suggests that those who received the aid for a fewer number of periods may not have been able to reapply leading them to believe that it was more income restrictive.
+
+The following is a graph visualizing the distribution of responses to the question "What are your thoughts on income restriction (earning less than $1000 a month) for CSRB?" in relation to how many periods a respondent applied for.
+
+```{r, echo = FALSE}
+CESB_restr_peri_graph <- 
+  survey_data %>%
+  mutate(peri_CESB_app = as.factor(peri_CESB_app)) %>%
+  ggplot( aes(x = peri_CESB_app, fill = inc_restr_CESB)) + 
+  geom_bar(position = "dodge") +
+  labs(
+    title = "Figure 11: Distribution of Opinions on the Income Restriction for
+    CESB Over Number of Periods Applied",
+    x = " CESB Periods Applied",
+    y = "Number of Respondents",
+    fill = "Opinions on CESB income restriction",
+    caption = "Source = Simulated Dataset")
+
+CESB_restr_peri_graph
+```
+
+Figure 11 displays how respondents responded to the CESB income restriction based on the periods they applied for. This shows a slight negative correlation between the number of periods and the proportion of respondents that believed the income restriction was too restrictive; however, the data on respondents that applied for the CESB for multiple periods is limited (1%-1.2% for every period over one) making this potentially misleading.
+
+# Discussion 
+
+The data set used in this analysis was formed through conducting simulations that used real life parameters in order to inform the data. For each given variable in the data set whether it be the employment status of a respondent or their eligibility for financial relief the probabilities set were based in reality. A prime example of this is in the age variable visualized in Figure 1. Probabilities for the age variable were set based on the real life demographics of the province of Alberta. There may be biases that arise with simulations but we attempted to mitigate this issue was by referencing current demographics and sentiments.
+
+As aforementioned the goal of the survey and of the analysis is to determine how residents of Alberta feel about the financial relief set out by the Liberal federal government when the COVID-19 pandemic hit. In this analysis the individual variable focused on is how residents of Alberta feel about the sustainability of the money given monthly under both CERB and CESB as well as sentiments towards the income restrictions required by both CERB and CESB in order to be eligible.
+
+As can be seen in both figure 2 and figure 3 which poses the question about sustainability of the given funds the most frequent responses were "adequate" and "too little". Specifically, in figure 2 which relates to CESB we see that "adequate" is the most frequent response while in figure 3 which relates to CERB, "too little" is the most frequent response. Something else that was looked at was how these responses broke down by age group, depicted in figure 8 and figure 9. Something interesting depicted in figure 9 which relates to the sustainability of CERB is that for the age group of 18-29 the overwhelming top response is "too little" while for ages 50-59 the top response is "adequate". This may be explained by the fact that those in a younger age group are spending more as they are setting their foundation financially while those in the older age bracket are more settled in, likely having more savings.
+ 
+Now consider how residents of Alberta feel about the income restrictions required in order to be eligible for CERB and CESB, depicted in figure 6 and 7. The overwhelming response for both CERB and CESB is “too restrictive". When looking at how this breaks down in relation to how many periods a respondent applied to CERB and CESB, depicted in figures 10 and 11 a pattern arises. Specifically in figure 10, those who applied for 0, 1 or 2 periods overwhelmingly believed that the income restriction was "too restrictive" while those who applied for 6 or 7 periods had less drastic differences in response to the 3 options. This intuitively makes sense as those who were not able to apply for many periods may not have been able to do so due to the income restriction of $1000 a month for CERB, therefore believing the standard was too restrictive.
+
+The important finding to note is that in general, residents of Alberta were not entirely satisfied with financial relief provided by the federal government. Though some believe that relief was adequate it is clear that the response leaned in favour of there being a greater amount of financial relief as supposed to believing that the federal government was being too generous. This is important to take note of as it may be significant knowledge to the Liberal government if they want to reach residents of Alberta in the next federal election as it is evident that they are in need of greater financial relief. There is space for the Liberal government to work on their relationship with residents of Alberta in order to gain their favour.
+
+## Appendix
+
+# Survey
+
+The following is a link to the survey: https://docs.google.com/forms/d/e/1FAIpQLScWIiKoJlXH8oKLdc-SUq9jojeDTS3On6O7An3scCRGlVi6gg/viewform?vc=0&c=0&w=1&flr=0&gxids=7628
+
+The following are images of the survey questions:
+  
+![Question "How old are you?"](/cloud/project/STA304 PS2 Q1.png)\
+
+![Question "What is your employment status before March?"](/cloud/project/STA304 PS2 Q2.png)\
+
+![Question "What is your current employment status?"](/cloud/project/STA304 PS2 Q3.png)\
+
+![Question "Are you currently a student?"](/cloud/project/STA304 PS2 Q4.png)\
+
+![Question "Were you eligible for Canada Emergency Student Benefit (CESB)?"](/cloud/project/STA304 PS2 Q5a.png)\
+
+![Question "Were you eligible for Canada Emergency Relief Benefit (CERB)?"](/cloud/project/STA304 PS2 Q5b.png)\
+
+![Question "If you applied, how many periods did you apply for CESB?"](/cloud/project/STA304 PS2 Q6a.png)\
+
+![Question " If you applied, how many periods did you apply for CERB?"](/cloud/project/STA304 PS2 Q6b.png)\
+
+![Question "Do you believe that $1250 payment of CESB a month is sustainable for students?"](/cloud/project/STA304 PS2 Q7a.png)\
+
+![Question "Do you believe that $2000 payment of CERB a month is sustainable?"](/cloud/project/STA304 PS2 Q7b.png)\
+
+![Question "Do you believe the 16 weeks period for CESB was long enough?"](/cloud/project/STA304 PS2 Q8a.png)\
+
+![Question "Do you believe the 28 weeks period for CERB was long enough?"](/cloud/project/STA304 PS2 Q8b.png)\
+
+![Question "On a scale of 1 to 5 how satisfied are you with the 4 weeks extension of CERB?"](/cloud/project/STA304 PS2 Q9a.png)\
+
+![Question "Do you believe that the 4 weeks extension should have been applied to CESB as well?"](/cloud/project/STA304 PS2 Q9b.png)\
+
+![Question "What are your thoughts on income restriction (earning less than $1000 a month) for CERB?"](/cloud/project/STA304 PS2 Q10a.png)\
+
+![Question "What are your thoughts on income restriction (less than $1000 a month) for CESB?"](/cloud/project/STA304 PS2 Q10b.png)\
+
+
+# References
+
+- Agency, Canada Revenue. “Applications to Date - Canada Emergency Student Benefit   (CESB).” aem, September 13, 2020.           https://www.canada.ca/en/revenue-agency/services/benefits/emergency-student-benefit/cesb-statistics.html.
+
+- “Analysis: Population by Age and Sex,” September 27, 2018. https://www150.statcan.gc.ca/n1/pub/91-215-x/2018002/sec2-eng.htm.
+
+- Canada, Elections. “Chapter 7 – Lists of Electors (7/2019).” Accessed October 7, 2020. https://www.elections.ca/content.aspx?section=res&dir=pub/ecdocs/rom/vII/ch_7&document=ch_7&lang=e.
+
+- “Canada Emergency Student Benefit (CESB).” aem, September 14, 2020. https://www.canada.ca/en/revenue-agency/services/benefits/emergency-student-benefit.html.
+
+- Canada, Service. “Canada Emergency Response Benefit Statistics.” aem, September 14, 2020. https://www.canada.ca/en/services/benefits/ei/claims-report.html.
+
+- “Determine Your Eligibility Period: CERB with CRA.” aem, September 15, 2020. https://www.canada.ca/en/revenue-agency/services/benefits/apply-for-cerb-with-cra/eligibility-periods.html#h4.
+
+- Elections Alberta. “Page Not Found.” Accessed October 7, 2020. https://www.elections.ab.ca/election-results/overall-summary-of-ballots-cast-and-voter-turnout/-https://web.ics.purdue.edu/~pbawa/421/SURVEY%20METHODS.htm.
+
+- “Election Night Results - Provinces & Territories.” Accessed October 7, 2020. https://enr.elections.ca/Provinces.aspx?lang=e.
+
+- Government of Canada, Statistics Canada. “Add/Remove Data - Labour Force Characteristics by Province, Monthly, Seasonally Adjusted,” May 30, 2018. https://www150.statcan.gc.ca/t1/tbl1/en/cv.action?pid=1410028703.
+
+- H. Wickham. ggplot2: Elegant Graphics for Data Analysis. Springer-Verlag New
+  York, 2016.
+
+- Hadley Wickham, Jim Hester and Romain Francois (2018). readr: Read
+  Rectangular Text Data. R package version 1.3.1.
+  https://CRAN.R-project.org/package=readr
+  
+- Hadley Wickham, Romain François, Lionel Henry and Kirill Müller (2020).
+  dplyr: A Grammar of Data Manipulation. R package version 1.0.2.
+  https://CRAN.R-project.org/package=dplyr
+
+- Ipsos. “Canadians Split on Future of CERB: 52% Believe CERB Should Be Discontinued at Its Earliest Opportunity.” Accessed October 7, 2020. https://www.ipsos.com/en-ca/news-and-polls/Canadians-Split-On-Future-Of-CERB-Half-Believe-CERB-Should-Be-Discountinued-At-Its-Earliest.
+
+- JJ Allaire and Yihui Xie and Jonathan McPherson and Javier Luraschi and
+  Kevin Ushey and Aron Atkins and Hadley Wickham and Joe Cheng and Winston
+  Chang and Richard Iannone (2020). rmarkdown: Dynamic Documents for R. R
+  package version 2.3. URL https://rmarkdown.rstudio.com.
+
+- “Labour Force Characteristics by Province, Monthly, Seasonally Adjusted,” May 30, 2018. https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=1410028703.
+
+- “Postsecondary Enrolments, by Registration Status, Institution Type, Status of Student in Canada and Gender,” February 19, 2020. https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=3710001801.
+
+- “Population Statistics.” Accessed October 7, 2020. https://www.alberta.ca/population-statistics.aspx.
+
+- Prime Minister of Canada. “Prime Minister Justin Trudeau,” June 9, 2013. https://pm.gc.ca/en/prime-minister-justin-trudeau.
+
+- R Core Team (2020). R: A language and environment for statistical computing.
+  R Foundation for Statistical Computing, Vienna, Austria. URL
+  https://www.R-project.org/.
+
+- Sinclair, Martha, Joanne O’Toole, Manori Malawaraarachchi, and Karin Leder. “Comparison of Response Rates and Cost-Effectiveness for a Community-Based Survey: Postal, Internet and Telephone Modes with Generic or Personalised Recruitment Approaches.” BMC Medical Research Methodology 12, no. 1 (August 31, 2012): 132. https://doi.org/10.1186/1471-2288-12-132.
+
+- “Unemployment Rate.” Accessed October 7, 2020. https://economicdashboard.alberta.ca/Unemployment.
+
+- Wickham et al., (2019). Welcome to the tidyverse. Journal of Open Source
+  Software, 4(43), 1686, https://doi.org/10.21105/joss.01686
+  
+- Yihui Xie (2020). knitr: A General-Purpose Package for Dynamic Report
+  Generation in R. R package version 1.29.
+
